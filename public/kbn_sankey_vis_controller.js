@@ -1,4 +1,8 @@
-import uiModules from 'ui/modules';
+var observeResize = require('./lib/observe_resize');
+require('./lib/observe_resize');
+import {
+  uiModules
+} from 'ui/modules';
 
 const module = uiModules.get('kibana/kbn_sankey_vis', ['kibana']);
 
@@ -96,14 +100,25 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
       .attr('transform', function (d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       })
-      .call(d3.behavior.drag()
-        .origin(function (d) {
-          return d;
-        })
-        .on('dragstart', function () {
-          this.parentNode.appendChild(this);
-        })
-        .on('drag', dragmove));
+      .on('click', function (node) {
+        console.log('click', node);
+        console.log('fields', energy.fields);
+
+        let searchField = energy.fields[node.name].field;
+        const q2 = {
+          query: {
+            match: {}
+          },
+          meta: {
+            index: energy.fields[node.name].index
+          }
+        };
+        q2.query.match[searchField] = {
+          query: node.name,
+          type: 'phrase'
+        };
+        queryFilter.addFilters([q2]);
+      })
 
     node.append('rect')
       .attr('height', function (d) {
@@ -139,11 +154,11 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
       .attr('x', 6 + sankey.nodeWidth())
       .attr('text-anchor', 'start');
 
-    function dragmove(d) {
-      d3.select(svgRoot).attr('transform', 'translate(' + d.x + ',' + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ')');
-      sankey.relayout();
-      link.attr('d', path);
-    }
+  };
+
+  var _render = function (data) {
+    d3.select(svgRoot).selectAll('svg').remove();
+    _buildVis(data);
   };
 
   $scope.$watch('esResponse', function (resp) {
@@ -151,6 +166,13 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
       var data = sankeyAggResponse($scope.vis, resp);
       globalData = data;
       _buildVis(data);
+    }
+  });
+
+  observeResize($element, function () {
+    if (globalData) {
+      _updateDimensions();
+      _render(globalData);
     }
   });
 });
