@@ -12,9 +12,10 @@ import $ from 'jquery';
 import S from 'd3-plugins-sankey-fixed';
 
 import AggResponseProvider from './lib/agg_response';
-
+import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 module.controller('KbnSankeyVisController', function ($scope, $element, $rootScope, Private) {
   const sankeyAggResponse = Private(AggResponseProvider);
+  const queryFilter = Private(FilterBarQueryFilterProvider);
 
   let svgRoot = $element[0];
   let color = d3.scale.category10();
@@ -101,9 +102,6 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
         return 'translate(' + d.x + ',' + d.y + ')';
       })
       .on('click', function (node) {
-        console.log('click', node);
-        console.log('fields', energy.fields);
-
         let searchField = energy.fields[node.name].field;
         const q2 = {
           query: {
@@ -164,6 +162,7 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
   $scope.$watch('esResponse', function (resp) {
     if (resp) {
       var data = sankeyAggResponse($scope.vis, resp);
+      console.log('data', data);
       globalData = data;
       _buildVis(data);
     }

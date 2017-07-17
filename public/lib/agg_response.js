@@ -9,10 +9,19 @@ module.exports = function sankeyProvider(Private, Notifier) {
 
   let nodes = {};
   let links = {};
+  var fields = {};
   let lastNode = -1;
 
   function processEntry(aggConfig, metric, aggData, prevNode) {
     _.each(aggData.buckets, function (b) {
+      var field = aggConfig.params.field.name;
+      var index = aggConfig.vis.indexPattern.id;
+
+      var bkey = aggConfig.fieldFormatter()(b.key);
+      fields[bkey] = {
+        index,
+        field
+      };
       if (isNaN(nodes[b.key])) {
         nodes[b.key] = lastNode + 1;
         lastNode = _.max(_.values(nodes));
@@ -39,6 +48,7 @@ module.exports = function sankeyProvider(Private, Notifier) {
     if (!buckets) {
       return {
         'slices': {
+          'fields': [],
           'nodes': [],
           'links': []
         }
@@ -61,6 +71,7 @@ module.exports = function sankeyProvider(Private, Notifier) {
     let invertNodes = _.invert(nodes);
     let chart = {
       'slices': {
+        'fields': fields,
         'nodes': _.map(_.keys(invertNodes), function (k) {
           return {
             'name': invertNodes[k]
