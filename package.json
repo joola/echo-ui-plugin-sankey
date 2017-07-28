@@ -1,6 +1,6 @@
 {
   "name": "kbn_sankey_vis",
-  "version": "5.5.1",
+  "version": "kibana",
   "authors": [
     "Chenryn <rao.chenlin@gmail.com>"
   ],
