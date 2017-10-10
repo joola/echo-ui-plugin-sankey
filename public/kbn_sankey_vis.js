@@ -1,7 +1,7 @@
-import { VisVisTypeProvider } from 'ui/vis/vis_type';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
-import { TemplateVisTypeProvider } from 'ui/template_vis_type/template_vis_type';
-import { VisSchemasProvider } from 'ui/vis/schemas';
+import { VisSchemasProvider } from 'ui/vis/editors/default/schemas';
+import { VisFactoryProvider } from 'ui/vis/vis_factory';
+
 import kbnSankeyVisTemplate from 'plugins/kbn_sankey_vis/kbn_sankey_vis.html';
 
 import 'ui/agg_table';
@@ -13,10 +13,10 @@ import 'plugins/kbn_sankey_vis/kbn_sankey_vis_controller';
 VisTypesRegistryProvider.register(KbnSankeyVisProvider);
 
 function KbnSankeyVisProvider(Private) {
-  let TemplateVisType = Private(TemplateVisTypeProvider);
-  let Schemas = Private(VisSchemasProvider);
+  const VisFactory = Private(VisFactoryProvider);
+  const Schemas = Private(VisSchemasProvider);
 
-  return new TemplateVisType({
+  return VisFactory.createAngularVisualization({
     name: 'kbn_sankey',
     title: 'Sankey Diagram',
     icon: 'fa-random',
