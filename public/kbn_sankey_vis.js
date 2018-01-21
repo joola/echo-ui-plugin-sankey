@@ -1,3 +1,4 @@
+import { CATEGORY } from 'ui/vis/vis_category';
 import { VisFactoryProvider } from 'ui/vis/vis_factory';
 import { VisSchemasProvider } from 'ui/vis/editors/default/schemas';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
@@ -14,13 +15,13 @@ VisTypesRegistryProvider.register(KbnSankeyVisProvider);
 function KbnSankeyVisProvider(Private) {
   const VisFactory = Private(VisFactoryProvider);
   const Schemas = Private(VisSchemasProvider);
-  const VisType = Private(VisVisTypeProvider);
 
   return VisFactory.createAngularVisualization({
     name: 'kbn_sankey',
     title: 'Sankey Diagram',
     icon: 'fa-random',
     description: 'Sankey charts are ideal for displaying the material, energy and cost flows.',
+    category: CATEGORY.DATA,
     template: kbnSankeyVisTemplate,
     params: {
       defaults: {
