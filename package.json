@@ -12,6 +12,7 @@
   "homepage": "https://github.com/WolfangAukang/kbn_sankey_vis",
   "repository": "https://github.com/WolfangAukang/kbn_sankey_vis.git",
   "dependencies": {
+    "d3-plugins-sankey": "^1.2.1",
     "d3-plugins-sankey-fixed": "WolfangAukang/d3-plugins-sankey"
   }
 }

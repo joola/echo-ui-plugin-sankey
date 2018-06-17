@@ -1,21 +1,19 @@
-var observeResize = require('./lib/observe_resize');
-require('./lib/observe_resize');
-import {
-  uiModules
-} from 'ui/modules';
+import { uiModules } from 'ui/modules';
 
 const module = uiModules.get('kibana/kbn_sankey_vis', ['kibana']);
 
 import d3 from 'd3';
 import _ from 'lodash';
 import $ from 'jquery';
-import S from 'd3-plugins-sankey-fixed';
+import 'd3-plugins-sankey';
 
 import AggResponseProvider from './lib/agg_response';
-import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
+import { filterNodesAndLinks } from './lib/filter';
+
+
 module.controller('KbnSankeyVisController', function ($scope, $element, $rootScope, Private) {
   const sankeyAggResponse = Private(AggResponseProvider);
-  const queryFilter = Private(FilterBarQueryFilterProvider);
+  $scope.emptyGraph = false;
 
   let svgRoot = $element[0];
   let color = d3.scale.category10();
@@ -44,8 +42,10 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
     }
   };
 
-
   let _buildVis = function (data) {
+    data.slices = filterNodesAndLinks(data.slices.nodes, data.slices.links);
+    $scope.emptyGraph = (data.slices.nodes.length <= 0) ;
+
     _updateDimensions();
 
     d3.select(svgRoot).selectAll('svg').remove();
@@ -101,22 +101,14 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
       .attr('transform', function (d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       })
-      .on('click', function (node) {
-        let searchField = energy.fields[node.name].field;
-        const q2 = {
-          query: {
-            match: {}
-          },
-          meta: {
-            index: energy.fields[node.name].index
-          }
-        };
-        q2.query.match[searchField] = {
-          query: node.name,
-          type: 'phrase'
-        };
-        queryFilter.addFilters([q2]);
-      })
+      .call(d3.behavior.drag()
+        .origin(function (d) {
+          return d;
+        })
+        .on('dragstart', function () {
+          this.parentNode.appendChild(this);
+        })
+        .on('drag', dragmove));
 
     node.append('rect')
       .attr('height', function (d) {
@@ -152,26 +144,20 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
       .attr('x', 6 + sankey.nodeWidth())
       .attr('text-anchor', 'start');
 
-  };
-
-  var _render = function (data) {
-    d3.select(svgRoot).selectAll('svg').remove();
-    _buildVis(data);
+    function dragmove(d) {
+      d3.select(this).attr('transform', 'translate(' + d.x + ',' + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ')');
+      sankey.relayout();
+      link.attr('d', path);
+    }
   };
 
   $scope.$watch('esResponse', function (resp) {
     if (resp) {
       var data = sankeyAggResponse($scope.vis, resp);
-      console.log('data', data);
       globalData = data;
-      _buildVis(data);
-    }
-  });
-
-  observeResize($element, function () {
-    if (globalData) {
-      _updateDimensions();
-      _render(globalData);
+      if (data && data.slices){
+        _buildVis(data);
+      }
     }
   });
 });
