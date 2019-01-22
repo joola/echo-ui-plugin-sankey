@@ -18,7 +18,7 @@ module.exports = function sankeyProvider(Private, Notifier) {
           slices: aggregate(aggData)
         };
       } else {
-        notify.error('Empty response.');
+        //notify.error('Empty response.');
         return {
           slices: { nodes: [], links: [] }
         };
