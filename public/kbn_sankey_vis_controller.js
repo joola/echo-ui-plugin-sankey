@@ -151,9 +151,10 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
     }
   };
 
-  $scope.$watch('esResponse', function (resp) {
-    if (resp) {
-      var data = sankeyAggResponse($scope.vis, resp);
+  $scope.$watch('renderComplete', async function () {
+  //$scope.$watch('esResponse', function (resp) {
+    if ($scope.esResponse) {
+      var data = sankeyAggResponse($scope.vis, $scope.esResponse);
       globalData = data;
       if (data && data.slices){
         _buildVis(data);

@@ -24,6 +24,7 @@
       description: 'Sankey charts are ideal for displaying the material, energy and cost flows.',
       visConfig: {
         defaults: {
+          handleNoResults: false,
           showMetricsAtAllLevels: false
         },
         template: kbnSankeyVisTemplate
@@ -55,7 +56,8 @@
           }
         ])
       },
-      requiresSearch: true
+      //requiresSearch: true,
+      responseHandler: 'tabify'
     });
   }
 
