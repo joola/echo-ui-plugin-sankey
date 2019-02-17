@@ -11,7 +11,6 @@ module.exports = function sankeyProvider(Private, Notifier) {
     buckets = arrayToLinkedList(buckets);
 
     if (buckets && buckets.length > 1) {
-      console.log('tables', buckets)
       if (resp.tables && resp.tables.length > 0 && resp.tables[0].rows) {
         const aggData = resp.tables[0].rows;
         return {

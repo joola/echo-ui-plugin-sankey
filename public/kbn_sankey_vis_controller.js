@@ -159,6 +159,7 @@ module.controller('KbnSankeyVisController', function ($scope, $element, $rootSco
       if (data && data.slices){
         _buildVis(data);
       }
+      $scope.renderComplete();
     }
   });
 });
