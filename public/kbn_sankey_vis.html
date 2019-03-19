@@ -1,3 +1,7 @@
 <div ng-controller="KbnSankeyVisController" class="metric-vis">
   <div class="metric-container" ng-model="metrics"></div>
+  <div ng-if="emptyGraph" class="table-vis-error ng-scope">
+    <h2 aria-hidden="true"><i aria-hidden="true" class="fa fa-meh-o"></i></h2>
+    <h4>No results found</h4>
+  </div>
 </div>
